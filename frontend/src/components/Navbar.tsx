@@ -1,9 +1,10 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import {
   ShoppingBasketIcon,
   PackageSearchIcon,
   ListIcon,
   UserIcon,
+  UserPlusIcon,
   LogInIcon,
   LogOutIcon,
   ShoppingCartIcon,
@@ -15,6 +16,7 @@ import Spinner from "../components/Spinner";
 const Navbar = () => {
   const { isLoggedIn, user, logout } = useAuth();
   const { getTotalCount, loadingCart } = useCart();
+  const location = useLocation();
 
   const linkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex items-center px-3 py-6 text-sm font-medium transition-colors ${
@@ -85,13 +87,33 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <Link
-              to="/login"
-              className="flex items-center rounded-sm cursor-pointer hover:bg-indigo-50 text-sm text-indigo-500 px-4 py-2 transition-all hover:scale-105"
-            >
-              <LogInIcon className="w-4 h-4 mr-2" />
-              Giriş Yap
-            </Link>
+            <>
+              {location.pathname === "/login" ? (
+                <Link
+                  to="/register"
+                  className="flex items-center rounded-sm cursor-pointer hover:bg-indigo-50 text-sm text-indigo-500 px-4 py-2 transition-all hover:scale-105"
+                >
+                  <UserPlusIcon className="w-4 h-4 mr-2" />
+                  Kayıt Ol
+                </Link>
+              ) : location.pathname === "/register" ? (
+                <Link
+                  to="/login"
+                  className="flex items-center rounded-sm cursor-pointer hover:bg-indigo-50 text-sm text-indigo-500 px-4 py-2 transition-all hover:scale-105"
+                >
+                  <LogInIcon className="w-4 h-4 mr-2" />
+                  Giriş Yap
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="flex items-center rounded-sm cursor-pointer hover:bg-indigo-50 text-sm text-indigo-500 px-4 py-2 transition-all hover:scale-105"
+                >
+                  <LogInIcon className="w-4 h-4 mr-2" />
+                  Giriş Yap
+                </Link>
+              )}
+            </>
           )}
         </div>
       </div>

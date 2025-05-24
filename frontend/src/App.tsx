@@ -17,6 +17,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import LoadingScreen from "./components/LoadingScreen";
+import Breadcrumbs from "./components/Breadcrumbs";
 
 function App() {
   const { loading, isLoggedIn } = useAuth();
@@ -33,6 +34,7 @@ function App() {
     <Router>
       <div className="flex flex-col">
         <Navbar />
+        <Breadcrumbs />
         <main className="min-h-[90vh]">
           <Routes>
             <Route
@@ -58,11 +60,8 @@ function App() {
               />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />{" "}
-              {/* Yeni: Checkout rotası */}
               <Route path="/orders" element={<OrdersPage />} />{" "}
-              {/* Yeni: Siparişler listesi rotası */}
               <Route path="/orders/:id" element={<OrderDetailPage />} />{" "}
-              {/* Yeni: Tek sipariş detayı rotası */}
             </Route>
           </Routes>
         </main>
