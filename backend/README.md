@@ -108,17 +108,19 @@ Bu projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izl
     DB_PASSWORD=your_password
 
     REDIS_HOST=127.0.0.1
-    REDIS_PASSWORD=null # Eğer Redis'te şifre yoksa null bırakın
+    REDIS_PASSWORD=null
     REDIS_PORT=6379
 
     SESSION_DRIVER=redis
+    SANCTUM_STATEFUL_DOMAINS=localhost:5173 #frontend url(örnek: example.com)
+    CORS_ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173,https://example.com" #frontend url(örnek: example.com)
     ```
 
 6.  Uygulama anahtarını oluşturun:
     ```bash
     php artisan key:generate
     ```
-7.  Veritabanı tablolarını oluşturun ve başlangıç verilerini ekleyin (isteğe bağlı):
+7.  Veritabanı tablolarını oluşturun ve başlangıç verilerini ekleyin (seed isteğe bağlı):
     ```bash
     php artisan migrate --seed
     ```
@@ -133,25 +135,21 @@ Bu projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izl
     ```bash
     cd ..
     ```
-2.  Frontend klasörüne gidin (projenizin yapısına göre `frontend`, `client` veya `web` gibi bir isimde olabilir):
+2.  Frontend klasörüne gidin:
     ```bash
     cd frontend
     ```
 3.  Node.js bağımlılıklarını yükleyin:
     ```bash
-    npm install # veya yarn install
+    npm install
     ```
-4.  `.env` dosyasını kopyalayın (API URL'i için):
-    ```bash
-    cp .env.example .env
-    ```
-5.  `.env` dosyasındaki `VITE_API_URL` değişkenini backend sunucunuzun adresiyle (örneğin `http://localhost:8000/api`) güncelleyin. Vite kullanıldığında `REACT_APP_API_URL` yerine `VITE_API_URL` kullanılır.
+4.  `.env` dosyasındaki `VITE_API_URL` değişkenini backend sunucunuzun adresiyle (örneğin `http://localhost:8000/api`) güncelleyin. Vite kullanıldığında `REACT_APP_API_URL` yerine `VITE_API_URL` kullanılır.
     ```env
     VITE_API_URL=http://localhost:8000/api
     ```
-6.  Frontend geliştirme sunucusunu başlatın:
+5.  Frontend geliştirme sunucusunu başlatın:
     ```bash
-    npm run dev # veya yarn dev
+    npm run dev
     ```
 
 Her iki sunucu da çalışır durumda olduğunda, tarayıcınızda `http://localhost:5173` (veya Vite'ın çalıştırdığı port) adresine giderek uygulamayı görüntüleyebilirsiniz.
