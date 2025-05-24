@@ -52,46 +52,45 @@ class OrderController extends Controller
             return response()->json(['message' => 'Sepetiniz boş veya bulunamadı.'], 400);
         }
 
-        DB::beginTransaction();
-
         try {
-            foreach ($currentCart->orderItems as $item) {
-                if ($item->product->stock < $item->quantity) {
-                    DB::rollBack();
-                    throw ValidationException::withMessages([
-                        'stock_error' => "Üzgünüz, {$item->product->name} ürünü için yeterli stok bulunmamaktadır. Mevcut stok: {$item->product->stock}",
-                    ]);
+            DB::transaction(function () use ($currentCart, $request) {
+                // Stok kontrolü
+                foreach ($currentCart->orderItems as $item) {
+                    if ($item->product->stock < $item->quantity) {
+                        throw ValidationException::withMessages([
+                            'stock_error' => "Üzgünüz, {$item->product->name} ürünü için yeterli stok bulunmamaktadır. Mevcut stok: {$item->product->stock}",
+                        ]);
+                    }
                 }
-            }
 
-            // Toplam fiyatı hesapla
-            $totalPrice = $currentCart->orderItems->sum(function ($item) {
-                return $item->quantity * $item->unit_price;
+                // Toplam fiyatı hesapla
+                $totalPrice = $currentCart->orderItems->sum(function ($item) {
+                    return $item->quantity * $item->unit_price;
+                });
+
+                // Sipariş Durumunu Güncelle ve Bilgileri Ekle
+                $currentCart->update([
+                    'order_status' => 'processing',
+                    'order_date' => now(),
+                    'shipping_address' => $request->shipping_address,
+                    'billing_address' => $request->billing_address ?? $request->shipping_address,
+                    'total_price' => $totalPrice,
+                ]);
+
+                // Stokları Azalt
+                foreach ($currentCart->orderItems as $item) {
+                    $item->product->decrement('stock', $item->quantity);
+                }
             });
 
-            // Sipariş Durumunu Güncelle ve Bilgileri Ekle
-            $currentCart->update([
-                'order_status' => 'processing',
-                'order_date' => now(),
-                'shipping_address' => $request->shipping_address,
-                'billing_address' => $request->billing_address ?? $request->shipping_address,
-                'total_price' => $totalPrice,
-            ]);
-
-            // Stokları Azalt
-            foreach ($currentCart->orderItems as $item) {
-                $item->product->decrement('stock', $item->quantity);
-            }
-
-            DB::commit();
-
+            // Transaction başarılı
             return response()->json(['message' => 'Siparişiniz başarıyla oluşturuldu!', 'orderId' => $currentCart->id], 200);
 
         } catch (ValidationException $e) {
-            DB::rollBack();
+            // DB::transaction() içinde fırlatılan ValidationException otomatik olarak transaction'ı geri alır
             return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            DB::rollBack();
+            // Diğer beklenmedik hatalar için, DB::transaction() zaten rollBack yapmıştır.
             Log::error("Sipariş oluşturulurken bir hata oluştu: " . $e->getMessage(), ['exception' => $e]);
             return response()->json(['message' => 'Siparişiniz oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.'], 500);
         }

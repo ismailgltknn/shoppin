@@ -66,6 +66,23 @@ Uygulama, temel e-ticaret işlevlerini sağlamak üzere tasarlanmıştır:
 -   **JS-Cookie**: `^3.0.5`
 -   **Heroicons / Lucide React**
 
+---
+
+### Unit Test
+
+Projenin backend kısmı için **Unit Testler** yazılmıştır. Bu testler, temel işlevselliğin (örneğin sepet yönetimi, stok kontrolleri) beklenen şekilde çalıştığını doğrular.
+
+APP_KEY üretmek ve Testleri çalıştırmak için `backend` klasöründe aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+php artisan key:generate --env=testing
+php artisan test
+```
+
+Uygulamanın şifreleme anahtarı (`APP_KEY`) ve test veritabanı ayarlarının (`.env.testing`) doğru yapıldığından emin olun.
+
+---
+
 ### Kurulum ve Çalıştırma
 
 Bu projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin.
