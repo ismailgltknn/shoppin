@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
+import Spinner from "../components/Spinner";
 
 const Navbar = () => {
   const { isLoggedIn, user, logout } = useAuth();
@@ -52,42 +53,24 @@ const Navbar = () => {
         <div className="flex items-center space-x-2">
           {isLoggedIn && user ? (
             <>
-              {loadingCart ? (
-                <div className="">
-                  <svg
-                    className="animate-spin h-5 w-5 text-indigo-600"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
+              <Link to="/cart">
+                <div className="relative hidden md:flex items-center text-sm text-gray-700 hover:text-indigo-500 font-medium px-3 py-2 rounded-md cursor-pointer hover:scale-105 space-x-1">
+                  {loadingCart ? (
+                    <Spinner
+                      size="sm"
+                      color="text-indigo-600"
+                      className="w-4 h-4"
                     />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8H4z"
-                    />
-                  </svg>
+                  ) : getTotalCount() > 0 ? (
+                    <span className="text-xs font-medium text-indigo-700 bg-indigo-50 transition-colors duration-200 border border-indigo-300 rounded-xl px-2 py-[2px] shadow-lg">
+                      {getTotalCount()}
+                    </span>
+                  ) : null}
+
+                  <ShoppingCartIcon className="w-5 h-5 text-indigo-500" />
+                  <span>Sepetim</span>
                 </div>
-              ) : (
-                <Link to="/cart">
-                  <div className="relative hidden md:flex items-center text-sm text-gray-700 hover:text-indigo-500 font-medium px-3 py-2 rounded-md cursor-pointer hover:scale-105">
-                    <ShoppingCartIcon className="w-5 h-5 mr-2 text-indigo-500" />
-                    Sepetim
-                    {getTotalCount() > 0 && (
-                      <span className="absolute -top-1.5 left-5.5 bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                        {getTotalCount()}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              )}
+              </Link>
 
               <div className="hidden md:flex items-center text-sm text-gray-700 font-medium px-3 py-2 rounded-md bg-gray-50">
                 <UserIcon className="w-4 h-4 mr-2 text-indigo-500" />

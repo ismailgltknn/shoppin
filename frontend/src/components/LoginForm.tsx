@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { LogInIcon } from "lucide-react";
+import Spinner from "../components/Spinner";
 
 const LoginForm = () => {
   const { login } = useAuth();
@@ -85,26 +86,7 @@ const LoginForm = () => {
               className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition font-semibold cursor-pointer"
             >
               {loading ? (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  />
-                </svg>
+                <Spinner size="sm" color="text-white" />
               ) : (
                 <>
                   <LogInIcon className="w-4 h-4" />

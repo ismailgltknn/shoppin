@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import { PackagePlusIcon, MinusIcon, PlusIcon } from "lucide-react";
+import Spinner from "../components/Spinner";
 import { useCart } from "../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 
@@ -114,26 +115,7 @@ const ProductsPage = () => {
   if (loadingCart) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <svg
-          className="animate-spin h-10 w-10 text-indigo-600"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          />
-        </svg>
+        <Spinner size="md" color="text-indigo-600" />
       </div>
     );
   }
@@ -268,28 +250,7 @@ const ProductsPage = () => {
             ref={observerRef}
             className="h-20 flex justify-center items-center mt-6"
           >
-            {loading && (
-              <svg
-                className="animate-spin h-6 w-6 text-indigo-500"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                />
-              </svg>
-            )}
+            {loading && <Spinner size="sm" color="text-indigo-600" />}
           </div>
         </section>
       </div>

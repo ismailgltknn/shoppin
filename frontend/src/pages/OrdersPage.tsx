@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "../api/axiosInstance";
 import { Link } from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 interface OrderItem {
   id: number;
@@ -73,7 +74,11 @@ const OrdersPage: React.FC = () => {
   };
 
   if (loading)
-    return <div className="p-4 text-center">Siparişler yükleniyor...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Spinner size="md" color="text-indigo-600" />
+      </div>
+    );
   if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
   if (orders.length === 0)
     return (
