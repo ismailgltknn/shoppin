@@ -122,37 +122,35 @@ const ProductsPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[200px_1fr] lg:grid-cols-[220px_1fr] xl:grid-cols-[240px_1fr] gap-8">
         {loadingCart || categories.length === 0 ? (
-          <div className="w-[240px]" />
+          <div className="hidden md:block" />
         ) : (
-          <aside className="sticky top-24 h-max bg-white border border-gray-200 rounded-sm p-4 max-h-[calc(100vh-7rem)] overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-3 text-gray-600">
+          <aside className="sticky top-24 h-max bg-gray-50/80 backdrop-blur-sm border border-gray-200 rounded-lg p-2 max-h-[calc(100vh-7rem)] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 ml-1 text-gray-800">
               Kategoriler
             </h2>
-            <hr className="text-gray-300 mb-4" />
-
             <ul className="flex flex-col gap-2">
               <li>
                 <button
                   onClick={() => handleCategorySelect(null)}
-                  className={`cursor-pointer w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`cursor-pointer w-full text-left px-4 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
                     selectedCategory === null
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
                   }`}
                 >
-                  Tümü
+                  Tüm Ürünler
                 </button>
               </li>
               {categories.map((category) => (
                 <li key={category.id}>
                   <button
                     onClick={() => handleCategorySelect(category.id)}
-                    className={`cursor-pointer w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`cursor-pointer w-full text-left px-4 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
                       selectedCategory === category.id
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-700 hover:bg-gray-100"
+                        ? "bg-indigo-600 text-white shadow-md"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
                     }`}
                   >
                     {category.name}
@@ -164,7 +162,7 @@ const ProductsPage = () => {
         )}
         <section className="flex flex-col">
           <div ref={productListRef} />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => {
               const cartItem = Array.isArray(cartItems)
                 ? cartItems.find((item) => item.productId === product.id)
@@ -173,44 +171,42 @@ const ProductsPage = () => {
               return (
                 <div
                   key={product.id}
-                  onClick={() => navigate(`/products/${product.id}`)}
-                  className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                 >
-                  <div className="w-full h-56 bg-gray-100">
+                  <div className="w-full h-48 sm:h-56 bg-gray-100 overflow-hidden rounded-t-xl">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      onClick={() => navigate(`/products/${product.id}`)}
+                      className="cursor-pointer w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                     />
                   </div>
-                  <div className="p-5 flex flex-col gap-2">
-                    <h2
-                      className="text-lg font-semibold text-gray-900 mb-1"
+                  <div className="p-4 flex flex-col gap-2">
+                    <h3
+                      onClick={() => navigate(`/products/${product.id}`)}
+                      className="cursor-pointer text-lg font-semibold text-gray-900 truncate"
                       title={product.name}
                     >
-                      {product.name.length > 15
-                        ? product.name.slice(0, 15) + " ..."
-                        : product.name}
-                    </h2>
-
-                    <h2 className="text-sm font-semibold text-gray-500 mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm font-medium text-gray-500">
                       {product.ct_name}
-                    </h2>
-                    <p className="text-indigo-600 font-bold text-lg">
+                    </p>
+                    <p className="text-indigo-700 font-extrabold text-xl mt-1">
                       {product.price} ₺
                     </p>
                     {cartItem ? (
-                      <div className="mt-4 flex items-center justify-center gap-2 border border-gray-300 p-1 rounded-sm mx-auto">
+                      <div className="mt-3 flex items-center justify-center gap-1 bg-gray-50 border border-gray-200 p-0.5 rounded-lg mx-auto w-fit min-w-[150px] shadow-sm">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             decreaseQuantity(cartItem.productId);
                           }}
-                          className="px-3 py-1 bg-gray-100 rounded-sm hover:bg-gray-300 text-lg font-bold cursor-pointer"
+                          className="cursor-pointer p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700 font-bold transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
                         >
-                          <MinusIcon className="w-5 h-5 text-gray-600" />
+                          <MinusIcon className="w-4 h-4" />
                         </button>
-                        <span className="px-2 text-sm font-semibold text-gray-700">
+                        <span className="px-2 text-sm font-semibold text-gray-800 tabular-nums">
                           {cartItem.quantity}
                         </span>
                         <button
@@ -221,9 +217,9 @@ const ProductsPage = () => {
                               quantity: 1,
                             });
                           }}
-                          className="px-3 py-1 bg-gray-100 rounded-sm hover:bg-gray-300 text-lg font-bold cursor-pointer"
+                          className="cursor-pointer p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700 font-bold transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
                         >
-                          <PlusIcon className="w-5 h-5 text-gray-600" />
+                          <PlusIcon className="w-4 h-4" />
                         </button>
                       </div>
                     ) : (
@@ -235,7 +231,7 @@ const ProductsPage = () => {
                             quantity: 1,
                           });
                         }}
-                        className="mt-4 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-sm hover:bg-indigo-700 transition duration-300"
+                        className="mt-3 w-full cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-sm hover:bg-indigo-700 transition-all duration-300 shadow-md"
                       >
                         <PackagePlusIcon className="w-5 h-5" />
                         Sepete Ekle
@@ -248,9 +244,9 @@ const ProductsPage = () => {
           </div>
           <div
             ref={observerRef}
-            className="h-20 flex justify-center items-center mt-6"
+            className="h-20 flex justify-center items-center mt-8"
           >
-            {loading && <Spinner size="sm" color="text-indigo-600" />}
+            {loading && <Spinner size="md" color="text-indigo-600" />}
           </div>
         </section>
       </div>

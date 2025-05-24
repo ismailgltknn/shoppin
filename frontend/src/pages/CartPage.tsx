@@ -1,5 +1,5 @@
 import { useCart } from "../contexts/CartContext";
-import { TrashIcon, PlusIcon, MinusIcon } from "lucide-react";
+import { Trash2Icon, PlusIcon, MinusIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 
@@ -31,105 +31,141 @@ const CartPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">
+        <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-12">
           Sepetim
         </h1>
 
         {cartItems.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg">
-            Sepetiniz boş.{" "}
-            <Link to="/products" className="text-indigo-600 hover:underline">
-              Ürünlere göz atın.
+          <div className="flex flex-col items-center justify-center py-10">
+            <p className="text-gray-600 text-xl mb-4">
+              Sepetiniz şu an boş görünüyor.
+            </p>
+            <Link
+              to="/products"
+              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors duration-300"
+            >
+              Ürünlere Göz Atın
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             <div className="lg:col-span-2 space-y-6">
               {cartItems.map((item) => (
                 <div
                   key={item.productId}
-                  onClick={() => navigate(`/products/${item.productId}`)}
-                  className="cursor-pointer bg-white rounded-lg shadow-sm p-4 flex items-center justify-between"
+                  className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col sm:flex-row items-center sm:justify-between gap-6"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-grow">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-20 h-20 object-cover rounded-md"
+                      onClick={() => navigate(`/products/${item.productId}`)}
+                      className="cursor-pointer w-24 h-24 object-cover rounded-lg border border-gray-100 shadow-sm"
                     />
-                    <div>
-                      <h2 className="text-lg font-semibold">{item.name}</h2>
-                      <p className="text-gray-500">{item.price} ₺</p>
+                    <div className="flex-grow">
+                      <h2
+                        className="cursor-pointer text-xl font-semibold text-gray-800 line-clamp-2"
+                        onClick={() => navigate(`/products/${item.productId}`)}
+                      >
+                        {item.name}
+                      </h2>
+                      <p className="text-gray-500 text-base mt-1">
+                        Birim Fiyat:{" "}
+                        <span className="font-bold text-indigo-600">
+                          {item.price.toFixed(2)} ₺
+                        </span>
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 border border-gray-300 p-1 rounded-sm ml-auto">
+                  <div className="flex items-center gap-4 mt-4 sm:mt-0">
+                    {/* Miktar kontrolü */}
+                    <div className="flex items-center justify-center gap-1 bg-gray-50 border border-gray-200 p-0.5 rounded-lg w-[150px] shadow-sm">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          decreaseQuantity(item.productId);
+                        }}
+                        className="cursor-pointer p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700 font-bold transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                        title="Adet azalt"
+                      >
+                        <MinusIcon className="w-4 h-4" />
+                      </button>
+
+                      <span className="flex-1 text-sm font-semibold text-gray-800 tabular-nums text-center">
+                        {item.quantity}
+                      </span>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart({
+                            productId: item.productId,
+                            quantity: 1,
+                          });
+                        }}
+                        className="cursor-pointer p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700 font-bold transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                        title="Adet artır"
+                      >
+                        <PlusIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {/* Ürünü Sil butonu */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        decreaseQuantity(item.productId);
+                        removeFromCart(item.productId);
                       }}
-                      className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-sm bg-gray-100 hover:bg-gray-200 transition shadow-sm"
-                      title="Adet azalt"
+                      className="cursor-pointer p-2 rounded-md hover:bg-red-50 transition-colors duration-200 flex items-center justify-center"
+                      title="Ürünü sepetten sil"
                     >
-                      <MinusIcon className="w-5 h-5 text-gray-600" />
-                    </button>
-
-                    <span className="font-semibold text-gray-800 min-w-[24px] text-center">
-                      {item.quantity}
-                    </span>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart({
-                          productId: item.productId,
-                          quantity: 1,
-                        });
-                      }}
-                      className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-sm bg-gray-100 hover:bg-gray-200 transition shadow-sm"
-                      title="Adet artır"
-                    >
-                      <PlusIcon className="w-5 h-5 text-gray-600" />
+                      <Trash2Icon className="w-5 h-5 text-red-500" />
                     </button>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFromCart(item.productId);
-                    }}
-                    className="cursor-pointer ml-4 w-9 h-9 flex items-center justify-center rounded-sm hover:scale-110 transition"
-                    title="Ürünü sil"
-                  >
-                    <TrashIcon className="w-5 h-5 text-red-500" />
-                  </button>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 h-fit sticky top-24 self-start">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            {/* Sipariş Özeti */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-fit sticky top-24 self-start border border-gray-100">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4 border-gray-200">
                 Sipariş Özeti
               </h2>
 
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Toplam Tutar:</span>
-                <span className="text-indigo-600 font-bold">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-gray-600 text-lg">Ürün Toplamı:</span>
+                <span className="text-gray-800 font-semibold text-lg">
+                  {totalPrice.toFixed(2)} ₺
+                </span>
+              </div>
+              <div className="flex justify-between items-center mb-6 border-b pb-4 border-gray-100">
+                <span className="text-gray-600 text-lg">Kargo Ücreti:</span>
+                <span className="text-green-600 font-semibold text-lg">
+                  Ücretsiz
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-indigo-800 text-xl font-bold">
+                  Genel Toplam:
+                </span>
+                <span className="text-indigo-800 font-extrabold text-2xl">
                   {totalPrice.toFixed(2)} ₺
                 </span>
               </div>
 
               <button
                 onClick={() => navigate("/checkout")}
-                className="w-full mt-10 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition cursor-pointer"
+                className="w-full px-6 py-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"
               >
-                Sepeti Onayla
+                Siparişi Tamamla
               </button>
 
               <button
                 onClick={clearCart}
-                className="w-full mt-6 text-sm text-red-600 hover:underline cursor-pointer"
+                className="w-full mt-10 px-6 py-3 text-sm text-red-600 bg-gray-50 hover:bg-gray-100 font-semibold rounded-lg transition-colors duration-300 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
+                <Trash2Icon className="w-4 h-4" />
                 Sepeti Temizle
               </button>
             </div>

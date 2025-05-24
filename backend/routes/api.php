@@ -3,12 +3,14 @@
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
+    Route::put('/user/profile', [UserController::class, 'update']);
 
     Route::get('/categories', function () {
         $categories = Category::select('id', 'name')->get();

@@ -9,9 +9,17 @@ import axiosInstance from "../api/axiosInstance";
 import axios from "axios";
 import Cookies from "js-cookie";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  shipping_address: string | null;
+  billing_address: string | null;
+}
+
 interface AuthContextType {
-  user: any | null;
-  setUser: React.Dispatch<React.SetStateAction<any | null>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isLoggedIn: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -22,12 +30,13 @@ interface AuthContextType {
     password: string;
     password_confirmation: string;
   }) => Promise<void>;
+  updateUser: (updatedUserData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -56,10 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string;
   }) => {
     try {
-      // XSRF token çerezinden al
       const xsrfToken = Cookies.get("XSRF-TOKEN");
 
-      // Giriş yap
       await axios.post(
         "http://localhost:8000/login",
         { email, password },
@@ -72,7 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       );
 
-      // Kullanıcıyı getir
       await fetchUser();
     } catch (error: any) {
       setUser(null);
@@ -84,7 +90,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      // XSRF token çerezinden al
       const xsrfToken = Cookies.get("XSRF-TOKEN");
 
       await axios.post(
@@ -117,7 +122,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password_confirmation: string;
   }) => {
     try {
-      // XSRF token çerezinden al
       const xsrfToken = Cookies.get("XSRF-TOKEN");
 
       await axios.post(
@@ -139,9 +143,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUser = (updatedUserData: Partial<User>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      return { ...prevUser, ...updatedUserData };
+    });
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, setUser, isLoggedIn, login, logout, register, loading }}
+      value={{
+        user,
+        setUser,
+        isLoggedIn,
+        login,
+        logout,
+        register,
+        loading,
+        updateUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

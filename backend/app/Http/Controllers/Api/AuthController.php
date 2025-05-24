@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +81,6 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return $request->user()->only(['id', 'name', 'email']);
+        return $request->user()->only(['id', 'name', 'email', 'shipping_address', 'billing_address']);
     }
 }

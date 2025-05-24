@@ -14,13 +14,15 @@ const Breadcrumbs: React.FC = () => {
     products: "Ürünler",
     orders: "Siparişlerim",
     cart: "Sepetim",
+    profile: "Profil",
     checkout: "Sipariş Onayı",
   };
 
   if (
     location.pathname === "/" ||
     location.pathname === "/login" ||
-    location.pathname === "/register"
+    location.pathname === "/register" ||
+    location.pathname === "/profile"
   ) {
     return null;
   }

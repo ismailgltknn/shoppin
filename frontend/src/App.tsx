@@ -11,6 +11,7 @@ import {
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
+import ProfilePage from "./pages/ProfilePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -52,6 +53,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route

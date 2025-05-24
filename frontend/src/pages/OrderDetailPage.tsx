@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "../api/axiosInstance";
 import { useParams, Link } from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 interface OrderItemApi {
   id: number;
@@ -113,7 +114,9 @@ const OrderDetailPage: React.FC = () => {
 
   if (loading)
     return (
-      <div className="p-4 text-center">Sipariş detayları yükleniyor...</div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Spinner size="md" color="text-indigo-600" />
+      </div>
     );
   if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
   if (!order)
@@ -122,9 +125,18 @@ const OrderDetailPage: React.FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">
-          Sipariş Detayı: <span className="text-indigo-600">#{order.id}</span>
-        </h1>
+        <div className="mt-8 flex items-center justify-between gap-4 mb-8 relative">
+          <Link
+            to="/orders"
+            className="z-10 flex-shrink-0 px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
+          >
+            &lt;&lt; Tüm Siparişlerime Geri Dön
+          </Link>
+          <h1 className="text-4xl font-bold text-gray-800 absolute left-1/2 transform -translate-x-1/2 w-full text-center">
+            Sipariş Detayı: <span className="text-indigo-600">#{order.id}</span>
+          </h1>
+          <div className="flex-shrink-0 w-[180px] hidden sm:block"></div>{" "}
+        </div>
 
         <div className="bg-white p-8 rounded-lg shadow-md mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -204,15 +216,6 @@ const OrderDetailPage: React.FC = () => {
           ) : (
             <p className="text-gray-600">Bu siparişte ürün bulunmamaktadır.</p>
           )}
-        </div>
-
-        <div className="text-center mt-8">
-          <Link
-            to="/orders"
-            className="inline-block px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors duration-200"
-          >
-            Tüm Siparişlerime Geri Dön
-          </Link>
         </div>
       </div>
     </div>
