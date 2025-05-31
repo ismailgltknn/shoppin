@@ -15,6 +15,7 @@ interface User {
   email: string;
   shipping_address: string | null;
   billing_address: string | null;
+  role: string | null;
 }
 
 interface AuthContextType {

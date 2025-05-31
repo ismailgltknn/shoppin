@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -42,6 +43,11 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $customerRole = Role::where('name', 'customer')->first();
+        if ($customerRole) {
+            $user->assignRole($customerRole);
+        }
 
         return response()->json(['message' => 'Kayıt başarılı'], 201);
     }
@@ -81,6 +87,15 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return $request->user()->only(['id', 'name', 'email', 'shipping_address', 'billing_address']);
+        $user = $request->user();
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'shipping_address' => $user->shipping_address,
+            'billing_address' => $user->billing_address,
+            'role' => $user->getRoleNames()->first(),
+        ]);
     }
 }

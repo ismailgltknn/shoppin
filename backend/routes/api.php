@@ -16,8 +16,6 @@ Route::middleware('auth:sanctum')->group(function () {
         $categories = Category::select('id', 'name')->get();
         return response()->json($categories);
     });
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
     // Sepet rotaları
     Route::get('/cart', [CartController::class, 'index']);
@@ -30,5 +28,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store']);
+
+
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+    // Admin ve Seller rolleri için ürün CRUD rotaları
+    Route::middleware(['role:admin|seller'])->group(function () {
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    });
 
 });
