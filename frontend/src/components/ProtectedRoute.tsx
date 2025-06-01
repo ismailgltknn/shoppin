@@ -4,9 +4,13 @@ import React from "react";
 
 interface ProtectedRouteProps {
   requiredRoles?: string[];
+  redirectPath?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRoles }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  requiredRoles,
+  redirectPath = "/", // Varsayılan değer olarak anasayfa
+}) => {
   const { isLoggedIn, user, loading } = useAuth();
 
   if (loading) {
@@ -17,17 +21,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRoles }) => {
     );
   }
 
+  // 1. Kullanıcı giriş yapmamışsa login sayfasına yönlendir
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
+  // 2. Eğer belirli roller gerekiyorsa ve kullanıcı bu rollere sahip değilse
   if (
     requiredRoles &&
     (!user || !user.role || !requiredRoles.includes(user.role))
   ) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectPath} replace />;
   }
 
+  // Tüm kontrollerden geçirilirse, child rotayı render et
   return <Outlet />;
 };
 

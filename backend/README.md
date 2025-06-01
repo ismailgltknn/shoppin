@@ -11,6 +11,9 @@ Bu proje, modern bir e-ticaret platformunun temel işlevlerini sunan bir web uyg
 -   **Hızlı ve Güvenli Sipariş:** Sepetinizdeki ürünlerle birlikte kolayca sipariş oluşturabilirsiniz. Gönderim ve fatura adresinizi belirterek siparişinizi tamamlayın.
 -   **Sipariş Takibi:** Oluşturduğunuz siparişlerin tüm detaylarını (içindeki ürünler, toplam tutar, gönderim durumu) görüntüleyebilir ve siparişinizin güncel durumunu takip edebilirsiniz.
 -   **Kullanıcı Dostu Arayüz:** Sade ve modern arayüzü sayesinde alışveriş deneyiminiz keyifli ve sorunsuz olacaktır.
+-   **Rol Tabanlı Yetkilendirme (Admin Paneli):** Laravel Spatie paketi kullanılarak `admin`, `seller` ve `customer` rolleri tanımlanmıştır. `admin` veya `seller` rolüne sahip kullanıcılar için özel bir yönetim paneli mevcuttur. Bu panelden:
+    -   **Kullanıcı Yönetimi:** Kullanıcıları görüntüleme, düzenleme ve silme işlemleri yapılabilir.
+    -   **Ürün Yönetimi:** Ürünleri görüntüleme, ekleme, düzenleme ve silme işlemleri yapılabilir.
 
 ---
 
@@ -22,7 +25,7 @@ Bu bölüm, projenin mimarisi, kullanılan teknolojiler ve kurulum süreçleri g
 
 Proje, iki ana bileşenden oluşan bir **monolitik** yapıya sahiptir:
 
--   **Backend (API):** Laravel framework kullanılarak geliştirilmiş bir RESTful API'dir. Veritabanı işlemleri, kimlik doğrulama, sepet ve sipariş mantığı bu katmanda yürütülür.
+-   **Backend (Laravel):** RESTful API'ler sağlar, veritabanı etkileşimlerini yönetir ve iş mantığını barındırır. Laravel Sanctum ile API kimlik doğrulaması ve Laravel Spatie ile rol ve yetkilendirme yönetimi entegre edilmiştir.
 -   **Frontend (UI):** React.js ile geliştirilmiş, backend API'yi kullanan tek sayfalık (SPA) bir kullanıcı arayüzüdür.
 
 ### Özellik Seti
