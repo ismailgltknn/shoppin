@@ -12,7 +12,7 @@ import { useAuth } from "./AuthContext";
 interface CartItem {
   productId: number;
   name: string;
-  price: number; // Burası number kalmalı
+  price: number;
   image: string;
   quantity: number;
 }

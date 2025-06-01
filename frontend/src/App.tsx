@@ -21,6 +21,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import PanelDashboardPage from "./pages/PanelDashboardPage";
 import UserManagementPage from "./pages/UserManagementPage";
 
+import { CartProvider } from "./contexts/CartContext";
 import { ProductProvider } from "./contexts/ProductContext";
 
 const LazyProductManagementPage = lazy(
@@ -47,18 +48,24 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
 
         {/* Ana Layout'u Kullanan Rotalar */}
-        <Route element={<MainLayout />}>
+        <Route
+          element={
+            <CartProvider>
+              <MainLayout />
+            </CartProvider>
+          }
+        >
           <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route
-            path="/categories"
-            element={<div className="">Kategoriler Sayfası</div>}
-          />
-          <Route path="/cart" element={<CartPage />} />
-
           {/* Sadece giriş yapmış kullanıcıların erişebileceği rotalar */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route
+              path="/categories"
+              element={<div className="">Kategoriler Sayfası</div>}
+            />
+            <Route path="/cart" element={<CartPage />} />
+
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/orders" element={<OrdersPage />} />
