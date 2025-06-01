@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AdminUserController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
@@ -38,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    });
+    // Admin ve Seller rolleri panel dashboard rotaları
+    Route::middleware(['role:admin|seller'])->group(function () {
+        Route::get('/admin/dashboard/stats', [DashboardController::class, 'getStats']);
     });
 
     // Admin rolü için Kulanıcı Yönetimi rotaları
