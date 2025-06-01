@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 import { useAuth } from "./contexts/AuthContext";
@@ -7,6 +8,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
@@ -24,7 +26,13 @@ import MainLayout from "./layouts/MainLayout";
 import NotFoundPage from "./pages/NotFoundPage";
 import PanelDashboardPage from "./pages/PanelDashboardPage";
 import UserManagementPage from "./pages/UserManagementPage";
-import ProductManagementPage from "./pages/ProductManagementPage";
+
+import { ProductProvider } from "./contexts/ProductContext";
+
+// ProductManagementPage'i lazy loading ile dinamik olarak içe aktar
+const LazyProductManagementPage = lazy(
+  () => import("./pages/ProductManagementPage")
+);
 
 function App() {
   const { loading, isLoggedIn } = useAuth();
@@ -39,6 +47,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" />
       <Routes>
         {/* Giriş ve Kayıt Sayfaları */}
         <Route element={<MainLayout />}>
@@ -73,12 +82,24 @@ function App() {
           </Route>
         </Route>
 
-        {/* Admin/Seller Protected Panel Rotaları (AdminLayout ile) */}
+        {/* Admin/Seller Protected Panel Rotaları */}
         <Route element={<ProtectedRoute requiredRoles={["admin", "seller"]} />}>
           <Route path="/panel" element={<AdminLayout />}>
             <Route index element={<PanelDashboardPage />} />
             <Route path="users" element={<UserManagementPage />} />
-            <Route path="products" element={<ProductManagementPage />} />
+            {/* ProductManagementPage'i ProductProvider içine al ve lazy yükle */}
+            <Route
+              path="products"
+              element={
+                <ProductProvider>
+                  <Suspense
+                    fallback={<LoadingScreen message="Ürünler yükleniyor..." />}
+                  >
+                    <LazyProductManagementPage />
+                  </Suspense>
+                </ProductProvider>
+              }
+            />
           </Route>
         </Route>
 

@@ -50,7 +50,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = () => {
         <nav className="flex flex-col p-4">
           <NavLink to="/panel" end className={sidebarNavLinkClasses}>
             <HomeIcon className="w-5 h-5 mr-3" />
-            Genel Bakış
+            Anasayfa
           </NavLink>
           <NavLink to="/panel/users" className={sidebarNavLinkClasses}>
             <UsersIcon className="w-5 h-5 mr-3" />
@@ -65,11 +65,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = () => {
 
       {/* Main Content Alanı */}
       <div className="flex-1 flex flex-col md:ml-64">
-        <header className="bg-white shadow-sm h-16 flex items-center px-4 pl-16 md:px-6">
-          <h1 className="text-xl font-semibold text-gray-800">
-            Yönetim Paneli
-          </h1>
-        </header>
         <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
           <Outlet />
         </main>

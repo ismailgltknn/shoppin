@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -15,19 +15,33 @@ class ProductController extends Controller
     {
         $query = Product::with('categories')->latest();
 
-        // Eğer category_id parametresi geldiyse filtrele
         if ($request->filled('category_id')) {
             $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('id', $request->category_id);
+                $q->where('categories.id', $request->category_id);
             });
         }
 
-        $products = $query->paginate(12);
+        $perPage = $request->input('per_page', 12);
+        if (!is_numeric($perPage) || $perPage < 1) {
+            $perPage = 12;
+        }
+
+        $products = $query->paginate($perPage);
 
         $products->getCollection()->transform(function ($product) {
-            $product->ct_name = $product->categories->first()?->name;
-            unset($product->categories);
-            return $product;
+            $firstCategory = $product->categories->first();
+
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'price' => $product->price,
+                'stock' => $product->stock,
+                'image' => $product->image,
+                'category_id' => $firstCategory ? $firstCategory->id : null,
+                'ct_name' => $firstCategory ? $firstCategory->name : null,
+            ];
         });
 
         return response()->json($products);
@@ -56,96 +70,58 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Create new product.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|unique:products,slug|max:255',
+            'slug' => 'required|string|max:255|unique:products,slug',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-        }
+        $validatedData = $validator->validated();
 
-        $product = Product::create([
-            'name' => $request->name,
-            'slug' => $request->slug,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'image' => $imagePath ? Storage::url($imagePath) : null,
-        ]);
+        $validatedData['image'] = null;
 
-        $category = Category::find($request->category_id);
-        if ($category) {
-            $product->categories()->sync([$category->id]);
-        }
+        $product = Product::create($validatedData);
+        $product->categories()->sync([$request->category_id]);
 
         return response()->json([
-            'message' => 'Ürün başarıyla oluşturuldu.',
+            'message' => 'Ürün başarıyla eklendi.',
             'product' => $this->formatProductForResponse($product->load('categories')),
         ], 201);
     }
 
-    /**
-     * Update product.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(Request $request, Product $product)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('products')->ignore($product->id),
+            ],
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if ($request->hasFile('image')) {
-            if ($product->image && Storage::disk('public')->exists(str_replace('/storage/', '', $product->image))) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $product->image));
-            }
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image = Storage::url($imagePath);
-        }
+        $validatedData = $validator->validated();
 
-        $product->update([
-            'name' => $request->name,
-            'slug' => $request->slug,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-        ]);
-
-        $category = Category::find($request->category_id);
-        if ($category) {
-            $product->categories()->sync([$category->id]);
-        }
+        $product->update($validatedData);
+        $product->categories()->sync([$request->category_id]);
 
         return response()->json([
             'message' => 'Ürün başarıyla güncellendi.',
@@ -153,42 +129,27 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Delete product.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Product $product)
     {
-        // Resmi sil (varsa)
-        if ($product->image && Storage::disk('public')->exists(str_replace('/storage/', '', $product->image))) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $product->image));
-        }
-
         $product->delete();
 
         return response()->json(['message' => 'Ürün başarıyla silindi.'], 200);
     }
 
-    /**
-     * Format product response.
-     *
-     * @param  \App\Models\Product  $product
-     * @return array
-     */
     protected function formatProductForResponse(Product $product)
     {
+        $firstCategory = $product->categories->first();
+
         return [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => (float) $product->price,
-            'image' => $product->image,
-            'description' => $product->description,
-            'ct_name' => $product->categories->first()?->name,
-            'stock' => $product->stock,
-            'category_id' => $product->categories->first()?->id,
             'slug' => $product->slug,
+            'description' => $product->description,
+            'price' => (string) $product->price,
+            'stock' => (int) $product->stock,
+            'image' => $product->image,
+            'category_id' => $firstCategory ? $firstCategory->id : null,
+            'ct_name' => $firstCategory ? $firstCategory->name : null,
         ];
     }
 
